@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tetris-cli.iml" filepath="$PROJECT_DIR$/.idea/modules/tetris-cli.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/tetris-cli-build.iml" filepath="$PROJECT_DIR$/.idea/modules/tetris-cli-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TetrisCli.iml" filepath="$PROJECT_DIR$/.idea/modules/TetrisCli.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TetrisCli-build.iml" filepath="$PROJECT_DIR$/.idea/modules/TetrisCli-build.iml" />
     </modules>
   </component>
 </project>
