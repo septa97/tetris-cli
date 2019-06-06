@@ -6,8 +6,6 @@
 
 ## Running the application
 
-* Unzip the file
-
 ```
 sbt run
 ```
