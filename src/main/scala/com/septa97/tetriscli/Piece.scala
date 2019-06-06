@@ -44,6 +44,34 @@ case class Piece(pieceType: Char) {
     isValid
   }
 
+  def moveLeft(tetris: Tetris): Boolean = {
+    val valid = (tetris.currentLeft > 0 || tetris.currentPiece.state
+      .map(e => e(math.abs(tetris.currentLeft)) == ' ')
+      .forall(identity)) && !hasFutureCollision(tetris,
+                                                tetris.currentLeft - 1,
+                                                tetris.currentTop + 1)
+
+    if (valid) {
+      tetris.currentLeft -= 1
+    }
+
+    valid
+  }
+
+  def moveRight(tetris: Tetris): Boolean = {
+    val valid = (tetris.currentLeft + tetris.currentPiece.sideLength < Tetris.BOARD_WIDTH || tetris.currentPiece.state
+      .map(e => e(Tetris.BOARD_WIDTH - tetris.currentLeft - 1) == ' ')
+      .forall(identity)) && !hasFutureCollision(tetris,
+                                                tetris.currentLeft + 1,
+                                                tetris.currentTop + 1)
+
+    if (valid) {
+      tetris.currentLeft += 1
+    }
+
+    valid
+  }
+
   def hasCollision(tetris: Tetris, newState: Array[Array[Char]]): Boolean = {
     val valids = for {
       i <- 0 until sideLength
@@ -65,6 +93,26 @@ case class Piece(pieceType: Char) {
 
     valids.forall(identity)
   }
+
+  def hasFutureCollision(tetris: Tetris,
+                         futureLeft: Int,
+                         futureTop: Int): Boolean = {
+    val collisions = for {
+      i <- 0 until tetris.currentPiece.sideLength
+      j <- 0 until tetris.currentPiece.sideLength
+
+      x = futureTop + i
+      y = futureLeft + j
+      if x >= 0 && x < Tetris.BOARD_HEIGHT && y >= 0 && y < Tetris.BOARD_WIDTH
+    } yield {
+      if (tetris.boardState(x)(y) == '*' && tetris.currentPiece.state(i)(j) == '*')
+        true
+      else false
+    }
+
+    collisions.exists(identity)
+  }
+
 }
 
 object Piece {

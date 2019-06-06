@@ -9,7 +9,10 @@ class Tetris {
     BOARD_HEIGHT,
     BOARD_WIDTH)(' ') // Initialize to empty space character
   var currentPiece: Piece = Piece.randomPiece()
-  var (currentTop, currentLeft) = getCurrentTopAndLeft()
+  var currentTop: Int = _
+  var currentLeft: Int = _
+
+  setCurrentTopAndLeft()
 
   def gameOver: Boolean = {
     val blocks = for {
@@ -32,13 +35,16 @@ class Tetris {
     blocks.exists(identity) || hasCollision
   }
 
-  def getCurrentTopAndLeft() = {
+  def setCurrentTopAndLeft() = {
     if (currentPiece.sideLength == 2) {
-      (2, 9)
+      currentTop = 2
+      currentLeft = 9
     } else if (currentPiece.sideLength == 3) {
-      (1, 9)
+      currentTop = 1
+      currentLeft = 9
     } else {
-      (0, 8)
+      currentTop = 0
+      currentLeft = 8
     }
   }
 
@@ -114,9 +120,9 @@ class Tetris {
 
     // Spawn a random piece
     currentPiece = Piece.randomPiece()
-    val newTopLeft = getCurrentTopAndLeft()
-    currentTop = newTopLeft._1
-    currentLeft = newTopLeft._2
+
+    // Update the current top and left index of the current falling piece
+    setCurrentTopAndLeft()
 
     // Exit the game if over
     if (gameOver) {
@@ -162,75 +168,32 @@ class Tetris {
     }
   }
 
-  def tick(valid: Boolean) = {
-    if (valid) {
-      // Check if the piece can't be moved anymore
-      if (sticked) {
-        updateState()
-      }
-
-      fallOneRow()
-      printBoard()
+  def tick() = {
+    // Check if the piece can't be moved anymore
+    if (sticked) {
+      updateState()
     }
+
+    fallOneRow()
+    printBoard()
 
     ()
-  }
-
-  def hasFutureCollision(futureLeft: Int, futureTop: Int): Boolean = {
-    val collisions = for {
-      i <- 0 until currentPiece.sideLength
-      j <- 0 until currentPiece.sideLength
-
-      x = futureTop + i
-      y = futureLeft + j
-      if x >= 0 && x < BOARD_HEIGHT && y >= 0 && y < BOARD_WIDTH
-    } yield {
-      if (boardState(x)(y) == '*' && currentPiece.state(i)(j) == '*') true
-      else false
-    }
-
-    collisions.exists(identity)
-  }
-
-  def moveLeft(): Boolean = {
-    val valid = (currentLeft > 0 || currentPiece.state
-      .map(e => e(math.abs(currentLeft)) == ' ')
-      .forall(identity)) && !hasFutureCollision(currentLeft - 1, currentTop + 1)
-
-    if (valid) {
-      currentLeft -= 1
-    }
-
-    valid
-  }
-
-  def moveRight(): Boolean = {
-    val valid = (currentLeft + currentPiece.sideLength < BOARD_WIDTH || currentPiece.state
-      .map(e => e(BOARD_WIDTH - currentLeft - 1) == ' ')
-      .forall(identity)) && !hasFutureCollision(currentLeft + 1, currentTop + 1)
-
-    if (valid) {
-      currentLeft += 1
-    }
-
-    valid
   }
 
   def start() = {
     var valid = true
 
     while (true) {
-      tick(valid)
-
       if (valid) {
+        tick()
         print(s"Enter move: ")
       } else {
         print(s"Invalid move. Please enter a new move: ")
       }
 
       StdIn.readLine() match {
-        case "a" => valid = moveLeft()
-        case "d" => valid = moveRight()
+        case "a" => valid = currentPiece.moveLeft(this)
+        case "d" => valid = currentPiece.moveRight(this)
         case "w" => valid = currentPiece.rotateCounterClockwise(this)
         case "s" => valid = currentPiece.rotateClockwise(this)
         case _   => valid = true
